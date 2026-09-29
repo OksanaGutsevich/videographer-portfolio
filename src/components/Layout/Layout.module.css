@@ -1,0 +1,11 @@
+/* Layout.module.css */
+.layoutWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layoutContent {
+  flex: 1;
+  padding: 0;
+}
