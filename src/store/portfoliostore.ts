@@ -29,7 +29,7 @@ const initialPortfolio: PortfolioItem[] = [
     description: "Красивая свадебная съемка в синематическом стиле",
     image:
       "https://images.unsplash.com/photo-1519741497674-611481863552?w=500&h=300&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://kinescope.io/rZsiJpQZZZ8VkgBdZbcaVU",
     featured: true,
   },
   {

@@ -1,3 +1,4 @@
+//videographer-portfolio\src\pages\Admin\Admin.tsx
 import styles from "./Admin.module.css";
 
 export default function Admin() {

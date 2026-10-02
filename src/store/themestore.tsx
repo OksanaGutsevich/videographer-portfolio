@@ -1,4 +1,4 @@
-// src/store/themeStore.tsx
+// src/store/themestore.tsx
 import { create } from "zustand";
 
 interface ThemeState {

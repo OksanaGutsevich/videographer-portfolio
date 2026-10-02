@@ -89,7 +89,7 @@ export default function Home() {
         <div className={styles.previewGrid}>
           <article className={styles.previewCard}>
             <img
-              src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80"
+              src="https://kinescope.io/rZsiJpQZZZ8VkgBdZbcaVU"
               alt="Wedding shoot"
             />
             <div className={styles.previewInfo}>
