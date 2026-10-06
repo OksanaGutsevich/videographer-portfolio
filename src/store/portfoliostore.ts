@@ -5,14 +5,17 @@ export interface PortfolioItem {
   id: number;
   title: string;
   category: "wedding" | "corporate" | "event" | "music";
-  description: string;
-  image: string;
-  videoUrl: string;
+  description: string | null;
+  image: string | null;
+  videoUrl: string | null;
   featured: boolean;
 }
 
 interface PortfolioState {
   portfolio: PortfolioItem[];
+  loading: boolean;
+  error: string | null;
+  fetchPortfolio: () => Promise<void>;
   addPortfolioItem: (item: Omit<PortfolioItem, "id">) => void;
   updatePortfolioItem: (
     id: number,
@@ -21,31 +24,35 @@ interface PortfolioState {
   deletePortfolioItem: (id: number) => void;
 }
 
-const initialPortfolio: PortfolioItem[] = [
-  {
-    id: 1,
-    title: "Wedding Cinematic",
-    category: "wedding",
-    description: "Красивая свадебная съемка в синематическом стиле",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?w=500&h=300&fit=crop",
-    videoUrl: "https://kinescope.io/rZsiJpQZZZ8VkgBdZbcaVU",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "Corporate Video",
-    category: "corporate",
-    description: "Видео для корпоративного клиента",
-    image:
-      "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500&h=300&fit=crop",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    featured: false,
-  },
-];
-
 export const usePortfolioStore = create<PortfolioState>((set) => ({
-  portfolio: initialPortfolio,
+  portfolio: [],
+  loading: false,
+  error: null,
+
+  fetchPortfolio: async () => {
+    set({ loading: true, error: null });
+    try {
+      const res = await fetch("/api/v1/portfolio");
+      if (!res.ok) throw new Error(`Ошибка сети: ${res.status}`);
+      const data = await res.json();
+
+      // Твой бэкенд возвращает сразу массив, поэтому берём его как есть
+      let portfolioData: PortfolioItem[] = [];
+      if (Array.isArray(data)) {
+        portfolioData = data;
+      } else if (data && Array.isArray(data.data)) {
+        // запасной вариант, если формат когда-то изменится
+        portfolioData = data.data;
+      }
+
+      set({ portfolio: portfolioData, loading: false });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Не удалось загрузить портфолио";
+      console.error(message);
+      set({ error: message, loading: false });
+    }
+  },
 
   addPortfolioItem: (item) => {
     set((state) => ({

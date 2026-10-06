@@ -1,6 +1,6 @@
 // src/pages/Portfolio/Portfolio.tsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePortfolioStore, PortfolioItem } from "../../store/portfoliostore";
 import styles from "./Portfolio.module.css";
 
@@ -14,15 +14,38 @@ const CATEGORIES: { label: string; value: Category }[] = [
   { label: "Музыка", value: "music" },
 ];
 
-// Переименовываем функцию в Portfolio (чтобы совпадало с именем страницы)
 export default function Portfolio() {
-  const portfolio = usePortfolioStore((state) => state.portfolio);
+  const { portfolio, loading, error, fetchPortfolio } = usePortfolioStore();
   const [activeCategory, setActiveCategory] = useState<Category>("all");
+
+  // Загружаем портфолио при монтировании
+  useEffect(() => {
+    fetchPortfolio();
+  }, [fetchPortfolio]);
 
   const filtered =
     activeCategory === "all"
       ? portfolio
       : portfolio.filter((item) => item.category === activeCategory);
+
+  if (loading) {
+    return (
+      <section className={styles.gallery}>
+        <p className={styles.empty}>Загрузка портфолио…</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.gallery}>
+        <p className={styles.error}>Ошибка загрузки: {error}</p>
+        <button onClick={() => fetchPortfolio()} className={styles.retryBtn}>
+          Попробовать снова
+        </button>
+      </section>
+    );
+  }
 
   return (
     <section className={styles.gallery}>
@@ -32,6 +55,7 @@ export default function Portfolio() {
             key={cat.value}
             onClick={() => setActiveCategory(cat.value)}
             className={`${styles.filterBtn} ${activeCategory === cat.value ? styles.active : ""}`}
+            type="button"
           >
             {cat.label}
           </button>
@@ -42,20 +66,27 @@ export default function Portfolio() {
         {filtered.map((item) => (
           <article key={item.id} className={styles.card}>
             <div className={styles.cardImage}>
-              <img src={item.image} alt={item.title} loading="lazy" />
+              {/* Проверка, чтобы не было битой картинки */}
+              {item.image ? (
+                <img src={item.image} alt={item.title} loading="lazy" />
+              ) : (
+                <div className={styles.placeholder}>Нет фото</div>
+              )}
               {item.featured && <span className={styles.badge}>Избранное</span>}
             </div>
             <div className={styles.cardBody}>
               <h3 className={styles.cardTitle}>{item.title}</h3>
               <p className={styles.cardDesc}>{item.description}</p>
-              <a
-                href={item.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.cardLink}
-              >
-                Смотреть ролик
-              </a>
+              {item.videoUrl && (
+                <a
+                  href={item.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.cardLink}
+                >
+                  Смотреть ролик
+                </a>
+              )}
             </div>
           </article>
         ))}
